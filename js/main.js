@@ -1,282 +1,207 @@
-
 (function ($) {
     "use strict";
 
-    /*[ Load page ]
-    ===========================================================*/
-    $(".animsition").animsition({
-        inClass: 'fade-in',
-        outClass: 'fade-out',
-        inDuration: 1500,
-        outDuration: 800,
-        linkElement: '.animsition-link',
-        loading: true,
-        loadingParentElement: 'html',
-        loadingClass: 'animsition-loading-1',
-        loadingInner: '<div class="loader05"></div>',
-        timeout: false,
-        timeoutCountdown: 5000,
-        onLoadEvent: true,
-        browser: [ 'animation-duration', '-webkit-animation-duration'],
-        overlay : false,
-        overlayClass : 'animsition-overlay-slide',
-        overlayParentElement : 'html',
-        transition: function(url){ window.location.href = url; }
-    });
+    // Spinner
+    var spinner = function () {
+        setTimeout(function () {
+            if ($('#spinner').length > 0) {
+                $('#spinner').removeClass('show');
+            }
+        }, 1);
+    };
+    spinner();
     
-    /*[ Back to top ]
-    ===========================================================*/
-    var windowH = $(window).height()/2;
-
-    $(window).on('scroll',function(){
-        if ($(this).scrollTop() > windowH) {
-            $("#myBtn").css('display','flex');
+    
+    // Back to top button
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 300) {
+            $('.back-to-top').fadeIn('slow');
         } else {
-            $("#myBtn").css('display','none');
+            $('.back-to-top').fadeOut('slow');
         }
     });
-
-    $('#myBtn').on("click", function(){
-        $('html, body').animate({scrollTop: 0}, 300);
+    $('.back-to-top').click(function () {
+        $('html, body').animate({scrollTop: 0}, 1500, 'easeInOutExpo');
+        return false;
     });
 
 
-    /*==================================================================
-    [ Fixed Header ]*/
-    var headerDesktop = $('.container-menu-desktop');
-    var wrapMenu = $('.wrap-menu-desktop');
-
-    if($('.top-bar').length > 0) {
-        var posWrapHeader = $('.top-bar').height();
-    }
-    else {
-        var posWrapHeader = 0;
-    }
-    
-
-    if($(window).scrollTop() > posWrapHeader) {
-        $(headerDesktop).addClass('fix-menu-desktop');
-        $(wrapMenu).css('top',0); 
-    }  
-    else {
-        $(headerDesktop).removeClass('fix-menu-desktop');
-        $(wrapMenu).css('top',posWrapHeader - $(this).scrollTop()); 
-    }
-
-    $(window).on('scroll',function(){
-        if($(this).scrollTop() > posWrapHeader) {
-            $(headerDesktop).addClass('fix-menu-desktop');
-            $(wrapMenu).css('top',0); 
-        }  
-        else {
-            $(headerDesktop).removeClass('fix-menu-desktop');
-            $(wrapMenu).css('top',posWrapHeader - $(this).scrollTop()); 
-        } 
+    // Sidebar Toggler
+    $('.sidebar-toggler').click(function () {
+        $('.sidebar, .content').toggleClass("open");
+        return false;
     });
 
 
-    /*==================================================================
-    [ Menu mobile ]*/
-    $('.btn-show-menu-mobile').on('click', function(){
-        $(this).toggleClass('is-active');
-        $('.menu-mobile').slideToggle();
+    // Progress Bar
+    $('.pg-bar').waypoint(function () {
+        $('.progress .progress-bar').each(function () {
+            $(this).css("width", $(this).attr("aria-valuenow") + '%');
+        });
+    }, {offset: '80%'});
+
+
+    // Calender
+    $('#calender').datetimepicker({
+        inline: true,
+        format: 'L'
     });
 
-    var arrowMainMenu = $('.arrow-main-menu-m');
 
-    for(var i=0; i<arrowMainMenu.length; i++){
-        $(arrowMainMenu[i]).on('click', function(){
-            $(this).parent().find('.sub-menu-m').slideToggle();
-            $(this).toggleClass('turn-arrow-main-menu-m');
-        })
-    }
+    // Testimonials carousel
+    $(".testimonial-carousel").owlCarousel({
+        autoplay: true,
+        smartSpeed: 1000,
+        items: 1,
+        dots: true,
+        loop: true,
+        nav : false
+    });
 
-    $(window).resize(function(){
-        if($(window).width() >= 992){
-            if($('.menu-mobile').css('display') == 'block') {
-                $('.menu-mobile').css('display','none');
-                $('.btn-show-menu-mobile').toggleClass('is-active');
-            }
 
-            $('.sub-menu-m').each(function(){
-                if($(this).css('display') == 'block') { console.log('hello');
-                    $(this).css('display','none');
-                    $(arrowMainMenu).removeClass('turn-arrow-main-menu-m');
+    // Worldwide Sales Chart
+    var ctx1 = $("#worldwide-sales").get(0).getContext("2d");
+    var myChart1 = new Chart(ctx1, {
+        type: "bar",
+        data: {
+            labels: ["2016", "2017", "2018", "2019", "2020", "2021", "2022"],
+            datasets: [{
+                    label: "USA",
+                    data: [15, 30, 55, 65, 60, 80, 95],
+                    backgroundColor: "rgba(0, 156, 255, .7)"
+                },
+                {
+                    label: "UK",
+                    data: [8, 35, 40, 60, 70, 55, 75],
+                    backgroundColor: "rgba(0, 156, 255, .5)"
+                },
+                {
+                    label: "AU",
+                    data: [12, 25, 45, 55, 65, 70, 60],
+                    backgroundColor: "rgba(0, 156, 255, .3)"
                 }
-            });
-                
+            ]
+            },
+        options: {
+            responsive: true
         }
     });
 
 
-    /*==================================================================
-    [ Show / hide modal search ]*/
-    $('.js-show-modal-search').on('click', function(){
-        $('.modal-search-header').addClass('show-modal-search');
-        $(this).css('opacity','0');
-    });
-
-    $('.js-hide-modal-search').on('click', function(){
-        $('.modal-search-header').removeClass('show-modal-search');
-        $('.js-show-modal-search').css('opacity','1');
-    });
-
-    $('.container-search-header').on('click', function(e){
-        e.stopPropagation();
-    });
-
-
-    /*==================================================================
-    [ Isotope ]*/
-    var $topeContainer = $('.isotope-grid');
-    var $filter = $('.filter-tope-group');
-
-    // filter items on button click
-    $filter.each(function () {
-        $filter.on('click', 'button', function () {
-            var filterValue = $(this).attr('data-filter');
-            $topeContainer.isotope({filter: filterValue});
-        });
-        
-    });
-
-    // init Isotope
-    $(window).on('load', function () {
-        var $grid = $topeContainer.each(function () {
-            $(this).isotope({
-                itemSelector: '.isotope-item',
-                layoutMode: 'fitRows',
-                percentPosition: true,
-                animationEngine : 'best-available',
-                masonry: {
-                    columnWidth: '.isotope-item'
+    // Salse & Revenue Chart
+    var ctx2 = $("#salse-revenue").get(0).getContext("2d");
+    var myChart2 = new Chart(ctx2, {
+        type: "line",
+        data: {
+            labels: ["2016", "2017", "2018", "2019", "2020", "2021", "2022"],
+            datasets: [{
+                    label: "Salse",
+                    data: [15, 30, 55, 45, 70, 65, 85],
+                    backgroundColor: "rgba(0, 156, 255, .5)",
+                    fill: true
+                },
+                {
+                    label: "Revenue",
+                    data: [99, 135, 170, 130, 190, 180, 270],
+                    backgroundColor: "rgba(0, 156, 255, .3)",
+                    fill: true
                 }
-            });
-        });
-    });
-
-    var isotopeButton = $('.filter-tope-group button');
-
-    $(isotopeButton).each(function(){
-        $(this).on('click', function(){
-            for(var i=0; i<isotopeButton.length; i++) {
-                $(isotopeButton[i]).removeClass('how-active1');
-            }
-
-            $(this).addClass('how-active1');
-        });
-    });
-
-    /*==================================================================
-    [ Filter / Search product ]*/
-    $('.js-show-filter').on('click',function(){
-        $(this).toggleClass('show-filter');
-        $('.panel-filter').slideToggle(400);
-
-        if($('.js-show-search').hasClass('show-search')) {
-            $('.js-show-search').removeClass('show-search');
-            $('.panel-search').slideUp(400);
-        }    
-    });
-
-    $('.js-show-search').on('click',function(){
-        $(this).toggleClass('show-search');
-        $('.panel-search').slideToggle(400);
-
-        if($('.js-show-filter').hasClass('show-filter')) {
-            $('.js-show-filter').removeClass('show-filter');
-            $('.panel-filter').slideUp(400);
-        }    
-    });
-
-
-
-
-    /*==================================================================
-    [ Cart ]*/
-    $('.js-show-cart').on('click',function(){
-        $('.js-panel-cart').addClass('show-header-cart');
-    });
-
-    $('.js-hide-cart').on('click',function(){
-        $('.js-panel-cart').removeClass('show-header-cart');
-    });
-
-    /*==================================================================
-    [ Cart ]*/
-    $('.js-show-sidebar').on('click',function(){
-        $('.js-sidebar').addClass('show-sidebar');
-    });
-
-    $('.js-hide-sidebar').on('click',function(){
-        $('.js-sidebar').removeClass('show-sidebar');
-    });
-
-    /*==================================================================
-    [ +/- num product ]*/
-    $('.btn-num-product-down').on('click', function(){
-        var numProduct = Number($(this).next().val());
-        if(numProduct > 0) $(this).next().val(numProduct - 1);
-    });
-
-    $('.btn-num-product-up').on('click', function(){
-        var numProduct = Number($(this).prev().val());
-        $(this).prev().val(numProduct + 1);
-    });
-
-    /*==================================================================
-    [ Rating ]*/
-    $('.wrap-rating').each(function(){
-        var item = $(this).find('.item-rating');
-        var rated = -1;
-        var input = $(this).find('input');
-        $(input).val(0);
-
-        $(item).on('mouseenter', function(){
-            var index = item.index(this);
-            var i = 0;
-            for(i=0; i<=index; i++) {
-                $(item[i]).removeClass('zmdi-star-outline');
-                $(item[i]).addClass('zmdi-star');
-            }
-
-            for(var j=i; j<item.length; j++) {
-                $(item[j]).addClass('zmdi-star-outline');
-                $(item[j]).removeClass('zmdi-star');
-            }
-        });
-
-        $(item).on('click', function(){
-            var index = item.index(this);
-            rated = index;
-            $(input).val(index+1);
-        });
-
-        $(this).on('mouseleave', function(){
-            var i = 0;
-            for(i=0; i<=rated; i++) {
-                $(item[i]).removeClass('zmdi-star-outline');
-                $(item[i]).addClass('zmdi-star');
-            }
-
-            for(var j=i; j<item.length; j++) {
-                $(item[j]).addClass('zmdi-star-outline');
-                $(item[j]).removeClass('zmdi-star');
-            }
-        });
+            ]
+            },
+        options: {
+            responsive: true
+        }
     });
     
-    /*==================================================================
-    [ Show modal1 ]*/
-    $('.js-show-modal1').on('click',function(e){
-        e.preventDefault();
-        $('.js-modal1').addClass('show-modal1');
+
+
+    // Single Line Chart
+    var ctx3 = $("#line-chart").get(0).getContext("2d");
+    var myChart3 = new Chart(ctx3, {
+        type: "line",
+        data: {
+            labels: [50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150],
+            datasets: [{
+                label: "Salse",
+                fill: false,
+                backgroundColor: "rgba(0, 156, 255, .3)",
+                data: [7, 8, 8, 9, 9, 9, 10, 11, 14, 14, 15]
+            }]
+        },
+        options: {
+            responsive: true
+        }
     });
 
-    $('.js-hide-modal1').on('click',function(){
-        $('.js-modal1').removeClass('show-modal1');
+
+    // Single Bar Chart
+    var ctx4 = $("#bar-chart").get(0).getContext("2d");
+    var myChart4 = new Chart(ctx4, {
+        type: "bar",
+        data: {
+            labels: ["Italy", "France", "Spain", "USA", "Argentina"],
+            datasets: [{
+                backgroundColor: [
+                    "rgba(0, 156, 255, .7)",
+                    "rgba(0, 156, 255, .6)",
+                    "rgba(0, 156, 255, .5)",
+                    "rgba(0, 156, 255, .4)",
+                    "rgba(0, 156, 255, .3)"
+                ],
+                data: [55, 49, 44, 24, 15]
+            }]
+        },
+        options: {
+            responsive: true
+        }
     });
 
 
+    // Pie Chart
+    var ctx5 = $("#pie-chart").get(0).getContext("2d");
+    var myChart5 = new Chart(ctx5, {
+        type: "pie",
+        data: {
+            labels: ["Italy", "France", "Spain", "USA", "Argentina"],
+            datasets: [{
+                backgroundColor: [
+                    "rgba(0, 156, 255, .7)",
+                    "rgba(0, 156, 255, .6)",
+                    "rgba(0, 156, 255, .5)",
+                    "rgba(0, 156, 255, .4)",
+                    "rgba(0, 156, 255, .3)"
+                ],
+                data: [55, 49, 44, 24, 15]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
 
+
+    // Doughnut Chart
+    var ctx6 = $("#doughnut-chart").get(0).getContext("2d");
+    var myChart6 = new Chart(ctx6, {
+        type: "doughnut",
+        data: {
+            labels: ["Italy", "France", "Spain", "USA", "Argentina"],
+            datasets: [{
+                backgroundColor: [
+                    "rgba(0, 156, 255, .7)",
+                    "rgba(0, 156, 255, .6)",
+                    "rgba(0, 156, 255, .5)",
+                    "rgba(0, 156, 255, .4)",
+                    "rgba(0, 156, 255, .3)"
+                ],
+                data: [55, 49, 44, 24, 15]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    
 })(jQuery);
+
