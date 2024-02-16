@@ -1,7 +1,7 @@
 <?php
  session_start();
- session_destroy();
+unset($_SESSION['email']);
  echo "<script>
- location.assign('index.php');
+ location.assign('../index.php');
  </script>";
 ?>

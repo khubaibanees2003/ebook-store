@@ -1,61 +1,147 @@
 <?php
+include('dbcon.php');
 session_start();
-include('dashmin-1.0.0/dbcon.php');
-// signup
+//add Category
 
-if(isset($_POST['register'])){
-  $username = $_POST['name'];
-  $useremail = $_POST['email'];
-  $userpassword = $_POST['password'];
-  $query = $pdo->prepare("insert  into users (name, email ,password) values ( :name ,:email , :password) ");
-  
-  $query->bindParam('name',$username);
-  $query->bindParam('email',$useremail);
-  $query->bindParam('password',$userpassword);
-  $query->execute();
-  echo" <script> 
-  alert('register succesfully');
-  location.assign('index.php');
-  </script> ";
-  
+if(isset($_POST['addcategory'])){
+  $cName = $_POST['cName'];
+  $cDes = $_POST['cDes'];
+  $imageName = $_FILES['cImage']['name'];
+  $imageTmpName = $_FILES['cImage']['tmp_name'];
+  $extension = pathinfo($imageName,PATHINFO_EXTENSION);
+  $destination = 'img/'.$imageName;
+  if($extension == "jpg" || $extension == "png" || $extension == "jpeg"){
+   if(move_uploaded_file($imageTmpName, $destination)){
+   $query = $pdo->prepare("insert into books_category(name , description , image) values (:cName , :cDes , :cImage)");
+   $query->bindParam('cName', $cName);
+   $query->bindParam('cDes', $cDes);
+   $query->bindParam('cImage', $imageName);
+   $query->execute();
+   echo "<script>alert('category added successfully');
+   </script>";
+  }
+ 
+ }
+ else{
+  echo "<script>alert('invalid format of file');
+   </script>";
+ }
+  }
+
+   //update category
+
+
+   if (isset($_POST['updatecategory'])) {
+    $cName = $_POST['cName'];
+    $cDes = $_POST['cDes'];
+    $cId = $_POST['cId'];
+    $query = $pdo->prepare("UPDATE books_category SET name = :cName, description = :cDes where id = :cId");
+    if(isset($_FILES['cImage'])){
+      $imageName = $_FILES['cImage']['name'];
+      $imageTmpName = $_FILES['cImage']['tmp_name'];
+      $extension = pathinfo($imageName,PATHINFO_EXTENSION);
+      $destination = "img/". $imageName;
+    
+      if($extension == "jpg" || $extension == "png" || $extension == "jpeg" ){
+          if(move_uploaded_file($imageTmpName,$destination)){
+              $query = $pdo->prepare("UPDATE books_category SET name = :cName, description = :cDes,image = :cImage where id = :cId");
+              $query->bindParam('cImage',$imageName);
+          
+ 
+    }
+  }
+ }
+              $query->bindParam('cId',$cId); 
+              $query->bindParam('cName',$cName);
+              $query->bindParam('cDes',$cDes);
+              $query->execute();
+              echo "<script>alert('Category updated successfully');
+              location.assign('viewcat.php');
+              </script>";
+          
+ }
+//Add book
+
+if(isset($_POST['addProduct'])){
+  $pName = $_POST['pName'];
+  $pDes = $_POST['pDes'];
+  $pPrice = $_POST['pPrice'];
+  $pQty = $_POST['pQty'];
+  $cId = $_POST['cId'];
+  $pAuthor = $_POST['pAuthor'];
+  $imageName = $_FILES['pImage']['name'];
+  $imageTmpName = $_FILES['pImage']['tmp_name'];
+  $extension = pathinfo($imageName,PATHINFO_EXTENSION);
+  $destination = 'img/'.$imageName;
+  if($extension == "jpg" || $extension == "png" || $extension == "jpeg") {
+   if(move_uploaded_file($imageTmpName, $destination)){
+   $query = $pdo->prepare("insert into books(name , description , image , price , quantity , cid , author  ) values (:pName , :pDes , :pImage , :pPrice , :pQty, :cId , :pAuthor )");
+   $query->bindParam('pName', $pName);
+   $query->bindParam('pDes', $pDes );
+   $query->bindParam('pPrice', $pPrice);
+   $query->bindParam('pQty',  $pQty);
+   $query->bindParam('cId',  $cId);
+   $query->bindParam('pImage', $imageName);
+   $query->bindParam('pAuthor',  $pAuthor);
+   $query->execute();
+   echo "<script>alert('Product added successfully');
+   </script>";
+  }
 }
 
+ }
+    
+   //update book
 
-// login
-if(isset($_POST['login'])){
-    $useremail = $_POST['email'];
-    $userpassword = $_POST['password'];
-    $query = $pdo->prepare("select * from users where email = :email AND password = :password");
-    $query->bindParam('email',$useremail);
-    $query->bindParam('password',$userpassword);
+  if (isset($_POST["updateProduct"])){
+    $pId =$_POST['pId'];
+    $pName =$_POST["pName"];
+    $pPrice =$_POST["pPrice"];
+    $pAuthor =$_POST["pAuthor"];
+    $pDes =$_POST["pDes"];
+    $pQty =$_POST["pQty"];
+    $cid =$_POST["cid"];
+
+    $query =$pdo->prepare("UPDATE books SET name = :pName, price = :pPrice, author = :pAuthor, description = :pDes, quantity = :pQty ,cid= :cid where id = :pId");
+
+    if(isset($_FILES['cImage'])){
+        $imageName = $_FILES['cImage']['name'];
+        $imagetmpName = $_FILES['cImage']['tmp_name'];
+        $extension = pathinfo($imageName, PATHINFO_EXTENSION);
+        $destination  = 'img/'.$imageName;
+        if($extension == "jpg" || $extension == "png" || $extension == "jpeg"){
+            if(move_uploaded_file($imagetmpName,$destination)){
+               $query = $pdo->prepare("UPDATE books SET name = :pName, price = :pPrice, author = :pAuthor, description = :pDes, quantity = :pQty, image = :cImage , cid = :cid  where id = :pId");
+               $query->bindParam("cImage",$imageName);
+              
+            }
+         }
+         else{
+          echo "<script>alert('erorr');
+          location.assign('admin-books.php');
+          </script>";
+      }
+    }
+    $query->bindParam("pId",$pId);
+    $query->bindParam("cid",$cid);
+    $query->bindParam("pName",$pName);
+    $query->bindParam("pPrice",$pPrice);
+    $query->bindParam("pAuthor",$pAuthor);
+    $query->bindParam("pDes",$pDes);
+    $query->bindParam("pQty",$pQty);
     $query->execute();
-    $res = $query->fetch(PDO::FETCH_ASSOC);
-    if($res){ 
-    if($res['role_id'] == 1 ){
-      $_SESSION['email'] = $res['email'];
-      $_SESSION['name'] = $res['name'];
-      $_SESSION['id'] = $res['id'];
-      echo" <script> 
-      alert('login succesfully');
-      location.assign('dashmin-1.0.0/index.php');
-      </script> ";
-    } 
-    else if($res['role_id'] == 2 ){
-        $_SESSION['uemail'] = $res['email'];
-        $_SESSION['uname'] = $res['name'];
-        $_SESSION['uid'] = $res['id'];
-        echo" <script> 
-        alert('login succesfully');
-        location.assign('index.php');
-        </script> ";
-      } 
-}
-else {
-  echo" <script> 
-  alert('Incorrect email or password. Please try again.');
-  </script> ";
-}
+    echo "<script>alert('book updated successfully');
+        location.assign('viewbook.php');
+    </script>";
 }
 
 
-?>
+
+
+?> 
+
+
+
+
+
+
